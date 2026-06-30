@@ -5,7 +5,11 @@ class loginPage{
     }
 
     async openLoginPage(){
-        await this.page.goto('https://eventhub.rahulshettyacademy.com/login');
+        await this.page.goto('/login');
+    }
+
+    async getEmailField(){
+        return this.page.getByPlaceholder('you@email.com');
     }
 }
 

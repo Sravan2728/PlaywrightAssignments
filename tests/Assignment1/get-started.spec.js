@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import {loginPage} from '../utils/loginPage';
+import {loginPage} from '../../utils/loginPage';
 test('EventHub login page loads', async({page}) => {
     const login = new loginPage(page);
     await login.openLoginPage();
