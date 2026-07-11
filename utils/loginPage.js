@@ -70,23 +70,111 @@ class loginPage {
         };
     }
 
-    async findBookingCardByRef(bookingRef){
+    async findBookingCardByRef(bookingRef) {
         const cards = this.page.locator('#booking-card');
-        console.log("Cards count: ",await cards.count());
-        for(let i=0;i< await cards.count();i++){
+        console.log("Cards count: ", await cards.count());
+        for (let i = 0; i < await cards.count(); i++) {
             const card = cards.nth(i);
             const refCode = await card.locator('.booking-ref').textContent();
-            console.log("ReferCode inside function: ",refCode);
-            console.log("ReferCode passed to a helper: ",bookingRef)
-            if(refCode === bookingRef){
+            console.log("ReferCode inside function: ", refCode);
+            console.log("ReferCode passed to a helper: ", bookingRef)
+            if (refCode === bookingRef) {
                 return card;
                 break;
             }
         }
     }
 
-    async openBookingDetailFromCard(card){
+    async openBookingDetailFromCard(card) {
         await card.locator('a').click();
+    }
+
+    buildMockEvents() {
+        return [
+            {
+
+                id: 4,
+                title: "Delhi Event",
+                description: "Celebrate the Festival of Lights at the grandest Diwali Mela in North India. Enjoy 200+ stalls of artisanal crafts, street food, folk performances, fireworks, and cultural showcases spanning three vibrant evenings.",
+                category: "Festival",
+                venue: "Pragati Maidan Exhibition Grounds",
+                city: "Delhi",
+                eventDate: "2026-10-20T17:00:00.000Z",
+                price: "300",
+                totalSeats: 1000,
+                availableSeats: 8,
+                imageUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800",
+                isStatic: true,
+                userId: null,
+                createdAt: "2026-02-22T23:03:37.680Z",
+                updatedAt: "2026-05-29T05:44:25.067Z"
+
+            },
+            {
+
+                id: 5,
+                title: "Hyderabad Event",
+                description: "A premier technology conference bringing together 500+ industry leaders, startup founders, and engineers for two days of keynotes, workshops, and networking. Topics include AI/ML, cloud infrastructure, DevSecOps, and the future of the Indian tech ecosystem.",
+                category: "Conference",
+                venue: "Hyderabad, Hitech city",
+                city: "Hyderabad",
+                eventDate: "2026-04-18T09:00:00.000Z",
+                price: "700",
+                totalSeats: 2000,
+                availableSeats: 8,
+                imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+                isStatic: true,
+                userId: null,
+                createdAt: "2026-02-22T23:03:37.659Z",
+                updatedAt: "2026-05-23T06:57:02.677Z"
+            },
+            {
+                id: 6,
+                title: "Mumbai Event",
+                description: "A premier technology conference bringing together 500+ industry leaders, startup founders, and engineers for two days of keynotes, workshops, and networking. Topics include AI/ML, cloud infrastructure, DevSecOps, and the future of the Indian tech ecosystem.",
+                category: "Concert",
+                venue: "Mumbai, Mumbai city",
+                city: "Mumbai",
+                eventDate: "2026-04-19T09:00:00.000Z",
+                price: "700",
+                totalSeats: 3000,
+                availableSeats: 10,
+                imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+                isStatic: true,
+                userId: null,
+                createdAt: "2026-02-22T23:03:37.659Z",
+                updatedAt: "2026-05-23T06:57:02.677Z"
+            },
+            {
+                id: 7,
+                title: "Bangalore Event",
+                description: "A premier technology conference bringing together 500+ industry leaders, startup founders, and engineers for two days of keynotes, workshops, and networking. Topics include AI/ML, cloud infrastructure, DevSecOps, and the future of the Indian tech ecosystem.",
+                category: "Workshop",
+                venue: "Bangalore, Bangalore city",
+                city: "Mumbai",
+                eventDate: "2026-04-19T09:00:00.000Z",
+                price: "700",
+                totalSeats: 4000,
+                availableSeats: 20,
+                imageUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800",
+                isStatic: true,
+                userId: null,
+                createdAt: "2026-02-22T23:03:37.659Z",
+                updatedAt: "2026-05-23T06:57:02.677Z"
+            }
+        ]
+    }
+
+    async installMockEventRoutes(page, mockEvents){
+        await page.route("https://api.eventhub.rahulshettyacademy.com/api/events?page=1&limit=12",
+       async route => {
+            const response = await page.request.fetch(route.request());
+            route.fulfill({
+                response,
+                body : JSON.stringify(mockEvents)
+            });
+        }
+    );
     }
 
 }
