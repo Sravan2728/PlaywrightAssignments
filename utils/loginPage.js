@@ -165,16 +165,73 @@ class loginPage {
         ]
     }
 
-    async installMockEventRoutes(page, mockEvents){
-        await page.route("https://api.eventhub.rahulshettyacademy.com/api/events?page=1&limit=12",
-       async route => {
-            const response = await page.request.fetch(route.request());
-            route.fulfill({
-                response,
-                body : JSON.stringify(mockEvents)
+    async installMockEventRoutes(page, mockEvents) {
+
+        // Catalog API
+        await page.route("**/api/events?**", async (route) => {
+
+            const url = new URL(route.request().url());
+
+            const search = url.searchParams.get("search");
+            const category = url.searchParams.get("category");
+            const city = url.searchParams.get("city");
+
+            let filteredEvents = [...mockEvents];
+
+            if (search) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.title.toLowerCase().includes(search.toLowerCase()) ||
+                    event.city.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+
+            if (category) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.category === category
+                );
+            }
+
+            if (city) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.city === city
+                );
+            }
+            await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: filteredEvents,
+                    pagination: {
+                        total: filteredEvents.length,
+                        page: 1,
+                        limit: 12,
+                        totalPages: 1
+                    }
+                })
             });
-        }
-    );
+        });
+
+        // Event Details API
+        await page.route("**/api/events/*", async (route) => {
+
+            const eventId = Number(route.request().url().split("/").pop());
+
+            const matchedEvent = mockEvents.find(event => event.id === eventId);
+
+            await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: matchedEvent
+                })
+            });
+        });
+    }
+
+    parseCurrency(text) {
+        return Number(text.replace(/[$,]/g, ""));
     }
 
 }
