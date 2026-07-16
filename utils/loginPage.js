@@ -234,6 +234,52 @@ class loginPage {
         return Number(text.replace(/[$,]/g, ""));
     }
 
+    async patchBookingsList(mutateBooking) {
+        return new Promise(async (resolve) => {
+            await this.page.route(
+                "**/api/bookings?page=1&limit=10",
+                async (route) => {
+                    console.log("Intercepted");
+                    const response = await route.fetch();
+                    console.log(response.status());
+                    const body = await response.json();
+                    const bookingData = body.data[0];
+                    bookingData.event.title = mutateBooking.eventTitle;
+                    bookingData.bookingRef = mutateBooking.bookingRef;
+                    bookingData.quantity = mutateBooking.quantity;
+                    bookingData.totalPrice = mutateBooking.totalPrice;
+                    await route.fulfill({
+                        response,
+                        json: body,
+                    });
+                    resolve(bookingData);
+                }
+            );
+        });
+    }
+
+    async patchBookingDetail(patchedBookingData) {
+        console.log("Patch Booking ID: ", patchedBookingData.id);
+        await this.page.route(
+            `**/api/bookings/${patchedBookingData.id}`,
+            async (route) => {
+                const response = await route.fetch();
+                console.log(response.status());
+                const body = await response.json();
+                console.log("Patch booking details: ", body);
+                body.data.event.title = patchedBookingData.event.title;
+                body.data.bookingRef = patchedBookingData.bookingRef;
+                body.data.quantity = patchedBookingData.quantity;
+                body.data.totalPrice = patchedBookingData.totalPrice;
+                body.data.event.price = patchedBookingData.totalPrice;
+                await route.fulfill({
+                    response,
+                    json: body,
+                });
+            }
+        );
+    }
+
 }
 
 module.exports = { loginPage };
