@@ -83,6 +83,7 @@ class loginPage {
                 break;
             }
         }
+        return null;
     }
 
     async openBookingDetailFromCard(card) {
@@ -278,6 +279,75 @@ class loginPage {
                 });
             }
         );
+    }
+
+    async createAuthorizedApiContext(playwright,userName,Password){
+        let authDetails = {};
+        const loginPayload = {email: userName, password: Password};
+        const requestContext = await playwright.request.newContext({
+            baseURL: "https://api.eventhub.rahulshettyacademy.com/api/",
+        });
+        const loginResp = await requestContext.post("auth/login",{
+            data : loginPayload
+        });
+        this.expect(loginResp.ok()).toBeTruthy();
+        const loginRespJson = await loginResp.json();
+        authDetails.token = loginRespJson.token;
+        authDetails.apiContext = requestContext;
+        return authDetails;
+    }
+
+    async injectTokenBeforeNavigation(page,token){
+        console.log(token,' in inject token method')
+        await page.addInitScript(value => {
+            window.localStorage.setItem('eventhub_token',value);
+        }, token); 
+    }
+
+    async selectBookableEvent(apiContext) {
+        console.log('Token from select Bookable event: ',apiContext.token);
+        const eventdata = await apiContext.apiContext.get("events?limit=6", {
+            headers: {
+                authorization: `Bearer ${apiContext.token}`,
+                accept: 'application/json, text/plain, */*'
+            }
+        });
+        console.log("Event URL: ",eventdata.url());
+        const eventDataResp = await eventdata.json();
+        let filterQuantity = eventDataResp.data;
+       filterQuantity = filterQuantity.find(event => event.availableSeats > 2);
+       return filterQuantity;
+    }
+
+    async createBooking(apiContext, payload){
+        const bookingData = await apiContext.apiContext.post('bookings',{
+            data: payload,
+            headers: {
+                authorization: `Bearer ${apiContext.token}`,
+                accept: 'application/json, text/plain, */*'
+            }
+        });
+        console.log('Booking URL: ',bookingData.url());
+        this.expect(bookingData.ok()).toBeTruthy();
+        const bookingDataResp = await bookingData.json();
+        return bookingDataResp;
+    }
+
+    async deleteBooking(apiContext,id){
+        let bookingID = id.toString();
+        const deleteBooking = await apiContext.apiContext.delete(`bookings/${bookingID}`,{
+            headers:{
+                authorization: `Bearer ${apiContext.token}`,
+                accept: 'application/json, text/plain, */*'
+            }
+        });
+
+        const deleteBookingResp = deleteBooking.json();
+        return deleteBookingResp;
+    }
+
+    async dispose(apiContext){
+        await apiContext.apiContext.dispose();
     }
 
 }

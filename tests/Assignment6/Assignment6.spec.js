@@ -1,5 +1,9 @@
-import { test, expect } from "@playwright/test"; import { loginPage } from "../../utils/loginPage"; test("Assignment5", async ({ page }) => {
-    const userName = "shravan.arepaka@gmail.com"; const password = "Sravan@1234"; const login = new loginPage(page, expect);
+import { test, expect } from "@playwright/test";
+import { loginPage } from "../../utils/loginPage";
+test("Assignment5", async ({ page }) => {
+    const userName = "shravan.arepaka@gmail.com"; 
+    const password = "Sravan@1234"; 
+    const login = new loginPage(page, expect);
     await login.openLoginPage(); await page.getByPlaceholder("you@email.com").fill(userName);
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: "Sign In" }).click();
