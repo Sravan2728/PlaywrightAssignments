@@ -1,0 +1,17 @@
+{
+  "name": "eventhub-js-playwright-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Working JavaScript Playwright starter framework for EventHub migration assignments",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/login-smoke.spec.js",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}

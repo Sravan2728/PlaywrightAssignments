@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", //Convert my TypeScript into JavaScript that modern browsers and Node.js understand.
+    "module": "NodeNext", //Playwright project runs on Node.js. This tells TypeScript how modules should be generated.
+    "moduleResolution": "NodeNext", //This tells TypeScript how to find imported files.
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".", //The project root is the starting point for imports.
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["node", "@playwright/test"],
+    "strict": true, //It catches mistakes early.
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["utils/**/*.ts", "tests/**/*.ts", "playwright.config.ts"]
+}
